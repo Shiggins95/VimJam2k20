@@ -225,7 +225,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   JumpForce: 1000
-  JumpTime: 5
+  JumpTime: 0.5
   _isJumping: 0
   SlamSpeed: 5000
   BloodSplash: {fileID: 0}
@@ -246,9 +246,9 @@ MonoBehaviour:
   Attack: 150
   Defence: 100
   Armour: 100
-  Health: 100
+  Health: 500
   Weapon: {fileID: 0}
-  AttackRange: 0.5
+  AttackRange: 1.5
   AttackLayerMask:
     serializedVersion: 2
     m_Bits: 4096

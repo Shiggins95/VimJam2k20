@@ -1,47 +1,109 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using UnityEngine;
-using Vector2 = UnityEngine.Vector2;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, EnemyClass
 {
-    public Transform Player;
+    private Transform _player;
+
+    public float EngagementDistance;
 
     public float StoppingDistance;
-
+    
     public float Speed;
 
-    public float RetreatDistance;
+    public float Attack;
+
+    public float Health;
+    public float Defence;
+    public float Armor;
+    private GameStateManager _gameStateManager;
+    public float AttackInterval;
+    private float _currentAttackInterval;
+    public List<int> CurrencyDropTable;
 
     // Start is called before the first frame update
     void Start()
     {
+        _player = FindObjectOfType<PlayerController>().transform;
+        _gameStateManager = FindObjectOfType<GameStateManager>();
+        _currentAttackInterval = AttackInterval;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector2 currentPosition = transform.position;
-        // if (Vector2.Distance(transform.position, Player.position) > BackOffRange)
-        // {
-        //     transform.position = Vector2.MoveTowards(currentPosition, Player.position, Speed * Time.deltaTime);
-        // }
-        // else if (Vector2.Distance(transform.position, Player.position) < BackOffRange &&
-        //          Vector2.Distance(transform.position, Player.position) > RetreatDistance)
-        // {
-        //     transform.position = this.transform.position;
-        // }
-        // else if (Vector2.Distance(transform.position, Player.position) < RetreatDistance)
-        // {
-        //     transform.position = Vector2.MoveTowards(currentPosition, Player.position, -Speed * Time.deltaTime);
-        // }
-        if (Vector2.Distance(currentPosition, Player.position) < StoppingDistance)
+        if (_gameStateManager.DisableMovement)
         {
-            var k = 0;
+            return;
         }
-        // if (Vector2.Distance(currentPosition, Player.position) < RetreatDistance)
-        // {
-        // }
+        Vector2 currentPosition = transform.position;
+        if (Vector2.Distance(currentPosition, _player.position) > EngagementDistance)
+        {
+            return;
+        }
+
+        if (Vector2.Distance(transform.position, _player.position) > StoppingDistance)
+        {
+            transform.position = Vector2.MoveTowards(currentPosition, _player.position, Speed * Time.deltaTime);
+        }
+
+        _currentAttackInterval -= Time.deltaTime;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (_gameStateManager.DisableMovement)
+        {
+            return;
+        }
+        if (other.CompareTag("Player"))
+        {
+            bool isDead = AttackAction.EnemyAttack(FindObjectOfType<PlayerAttack>(), this);
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (_gameStateManager.DisableMovement)
+        {
+            return;
+        }
+        if (_currentAttackInterval <= 0)
+        {
+            bool isDead = AttackAction.EnemyAttack(FindObjectOfType<PlayerAttack>(), this);
+            _currentAttackInterval = AttackInterval;
+        }
+    }
+
+    public float GetAttack()
+    {
+        return Attack;
+    }
+
+    public float GetDefence()
+    {
+        return Defence;
+    }
+
+    public float GetArmor()
+    {
+        return Armor;
+    }
+
+    public float GetHealth()
+    {
+        return Health;
+    }
+
+    public bool DecreaseHealth(float attack)
+    {
+        Health -= attack;
+        return Health > 0;
+    }
+
+    public List<int> GetCurrencySpawnTable()
+    {
+        return CurrencyDropTable;
     }
 }

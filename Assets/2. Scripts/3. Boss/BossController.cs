@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using TreeEditor;
 using UnityEngine;
 
-public class BossController : MonoBehaviour
+public class BossController : MonoBehaviour, EnemyClass
 {
     public float Speed;
 
@@ -30,10 +31,11 @@ public class BossController : MonoBehaviour
 
     public Dialog Dialog;
 
+    public List<int> CurrencyDropTable;
+
     private void Start()
     {
         startingPosition = transform.position;
-        Debug.Log($"starting position: {startingPosition.x},{startingPosition.y}");
     }
 
     // Update is called once per frame
@@ -81,5 +83,38 @@ public class BossController : MonoBehaviour
         {
             transform.position = new Vector2(currentPosition.x + Speed * Time.deltaTime, startingPosition.y);
         }
+    }
+
+
+    public float GetAttack()
+    {
+        return Attack;
+    }
+
+    public float GetDefence()
+    {
+        return Defence;
+    }
+
+    public float GetArmor()
+    {
+        return Armour;
+    }
+
+    public float GetHealth()
+    {
+        return Health;
+    }
+
+    public bool DecreaseHealth(float attack)
+    {
+        Health -= attack;
+        return Health > 0;
+    }
+
+
+    public List<int> GetCurrencySpawnTable()
+    {
+        return CurrencyDropTable;
     }
 }
