@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class EnemyController : MonoBehaviour, EnemyClass
 {
@@ -9,7 +10,7 @@ public class EnemyController : MonoBehaviour, EnemyClass
     public float EngagementDistance;
 
     public float StoppingDistance;
-    
+
     public float Speed;
 
     public float Attack;
@@ -22,9 +23,18 @@ public class EnemyController : MonoBehaviour, EnemyClass
     private float _currentAttackInterval;
     public List<int> CurrencyDropTable;
 
+    public float RetreatTimer;
+    private float _currentRetreatTimer;
+    private bool _isRetreating;
+
+    public Transform Canvas;
+
+    public ClampToParent LootDisplay;
+
     // Start is called before the first frame update
     void Start()
     {
+        _currentRetreatTimer = Random.Range(0.1f, RetreatTimer);
         _player = FindObjectOfType<PlayerController>().transform;
         _gameStateManager = FindObjectOfType<GameStateManager>();
         _currentAttackInterval = AttackInterval;
@@ -37,6 +47,14 @@ public class EnemyController : MonoBehaviour, EnemyClass
         {
             return;
         }
+
+        if (Health <= 0)
+        {
+            Destroy(gameObject);
+            // TODO - MAKE ANIMATION FOR DEATH AND TRIGGER
+            return;
+        }
+
         Vector2 currentPosition = transform.position;
         if (Vector2.Distance(currentPosition, _player.position) > EngagementDistance)
         {
@@ -45,35 +63,29 @@ public class EnemyController : MonoBehaviour, EnemyClass
 
         if (Vector2.Distance(transform.position, _player.position) > StoppingDistance)
         {
-            transform.position = Vector2.MoveTowards(currentPosition, _player.position, Speed * Time.deltaTime);
+            float _speed = Speed;
+            if (_isRetreating && _currentRetreatTimer >= 0)
+            {
+                _speed = (Speed / 2) * -1;
+            }
+            else
+            {
+                _isRetreating = false;
+                _currentRetreatTimer = Random.Range(0.1f, RetreatTimer);
+                _speed = Speed;
+            }
+
+            transform.position = Vector2.MoveTowards(currentPosition, _player.position, _speed * Time.deltaTime);
+            _currentRetreatTimer -= Time.deltaTime;
+        }
+
+        if (Vector2.Distance(transform.position, _player.position) < StoppingDistance)
+        {
+            _isRetreating = true;
+            transform.position = Vector2.MoveTowards(currentPosition, _player.position, (-Speed / 2) * Time.deltaTime);
         }
 
         _currentAttackInterval -= Time.deltaTime;
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (_gameStateManager.DisableMovement)
-        {
-            return;
-        }
-        if (other.CompareTag("Player"))
-        {
-            bool isDead = AttackAction.EnemyAttack(FindObjectOfType<PlayerAttack>(), this);
-        }
-    }
-
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (_gameStateManager.DisableMovement)
-        {
-            return;
-        }
-        if (_currentAttackInterval <= 0)
-        {
-            bool isDead = AttackAction.EnemyAttack(FindObjectOfType<PlayerAttack>(), this);
-            _currentAttackInterval = AttackInterval;
-        }
     }
 
     public float GetAttack()
@@ -105,5 +117,20 @@ public class EnemyController : MonoBehaviour, EnemyClass
     public List<int> GetCurrencySpawnTable()
     {
         return CurrencyDropTable;
+    }
+
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
+
+    public ClampToParent GetClampToParent()
+    {
+        return LootDisplay;
+    }
+
+    public Transform GetCanvas()
+    {
+        return Canvas;
     }
 }

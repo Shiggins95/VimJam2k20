@@ -16,13 +16,16 @@ public class DialogManager : MonoBehaviour
     private bool _stillTyping;
     private bool _speedUp;
 
+    private bool _isStarted;
     public static DialogManager Instance;
+
+    private string Type;
 
     private void Awake()
     {
         Instance = this;
     }
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +36,11 @@ public class DialogManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space) && !_stillTyping && _isStarted)
+        {
+            DisplayNextSentence();
+        }
+        
         if (Input.GetKey(KeyCode.Space))
         {
             if (_textSpeed <= 0.01)
@@ -50,8 +58,10 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-    public void StartDialog(Dialog dialog)
+    public void StartDialog(Dialog dialog, string type)
     {
+        _isStarted = true;
+        Type = type;
         Animator.SetBool("IsOpen", true);
         Debug.Log($"Starting convo with {dialog.Name}");
         NameText.text = dialog.Name;
@@ -66,14 +76,15 @@ public class DialogManager : MonoBehaviour
 
     public void DisplayNextSentence()
     {
-        if (Sentences.Count == 0)
-        {
-            EndDialog();
-            return;
-        }
 
         if (_stillTyping)
         {
+            return;
+        }
+        
+        if (Sentences.Count == 0)
+        {
+            EndDialog();
             return;
         }
 
@@ -99,11 +110,20 @@ public class DialogManager : MonoBehaviour
     {
         Debug.Log($"dialog ended");
         Animator.SetBool("IsOpen", false);
+        _isStarted = false;
         // if event exists, invoke
-        StartBattle?.Invoke();
+        if (Type == "START")
+        {
+            StartBattle?.Invoke();
+        }
+        else if (Type == "END")
+        {
+            EndBattle?.Invoke();
+        }
     }
-    
+
     public delegate void BossCallback();
 
     public BossCallback StartBattle;
+    public BossCallback EndBattle;
 }

@@ -7,14 +7,21 @@ public class Projectile : MonoBehaviour
 {
     public float Speed;
 
-    private Transform _player;
-    private Vector2 _target;
+    public Transform _player;
+    public Vector2 _target;
     private GameStateManager _gameStateManager;
+    public GameObject Particles;
+    private CameraShake _mainCamera;
+    public float CameraShakeMagnitude;
+    public float CameraShakeDuration;
+
+    public float Damage;
 
     private void Start()
     {
+        _mainCamera = FindObjectOfType<CameraShake>();
         _gameStateManager = FindObjectOfType<GameStateManager>();
-        _player = GameObject.FindGameObjectWithTag("Player").transform;
+        _player = GameObject.FindGameObjectWithTag("PlayerTarget").transform;
         _target = new Vector2(_player.position.x, _player.position.y);
     }
 
@@ -27,19 +34,41 @@ public class Projectile : MonoBehaviour
 
         if (Math.Abs(transform.position.x - _target.x) <= 0.05 && Math.Abs(transform.position.y - _target.y) <= 0.05)
         {
-            Destroy(gameObject);
+            GameObject particles = Instantiate(Particles, null, false);
+            particles.transform.position = transform.position;
+            _mainCamera.Shake(CameraShakeMagnitude, CameraShakeDuration);
+            Debug.Log($"destroying");
+            StartCoroutine(DestroySelf());
             return;
         }
 
         transform.position
-            = Vector2.MoveTowards(transform.position, _target, Speed * Time.deltaTime);
+            = Vector2.MoveTowards(transform.position, _target, Speed * 2 * Time.deltaTime);
+    }
+    
+    private IEnumerator DestroySelf()
+    {
+        yield return new WaitForSeconds(0.1f);
+        Destroy(gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            Destroy(gameObject);
+            PlayerAttack player = other.gameObject.GetComponent<PlayerAttack>();
+            float attack = Damage - (player.Armour + player.Defence);
+            if (attack <= 0)
+            {
+                attack = 10;
+            }
+
+            player.Health -= attack;
+
+            GameObject particles = Instantiate(Particles, null, false);
+            particles.transform.position = transform.position;
+            _mainCamera.Shake(CameraShakeMagnitude, CameraShakeDuration);
+            StartCoroutine(DestroySelf());
         }
     }
 }

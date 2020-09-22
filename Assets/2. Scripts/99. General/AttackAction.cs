@@ -12,53 +12,75 @@ public static class AttackAction
 
     public static bool PlayerAttack(PlayerAttack player)
     {
-        if (player.Weapon)
+        // check for collider based on player attack point position and attacking range
+        Collider2D collider =
+            Physics2D.OverlapCircle(player.AttackPoint.position, player.AttackRange, player.AttackLayerMask);
+        if (collider)
         {
-        }
-        else
-        {
-            // check for collider based on player attack point position and attacking range
-            Collider2D collider =
-                Physics2D.OverlapCircle(player.AttackPoint.position, player.AttackRange, player.AttackLayerMask);
-            if (collider)
+            // if collider exists, do logic to calculate damage
+            EnemyClass target = collider.gameObject.GetComponent<EnemyClass>();
+            if (target != null)
             {
-                // if collider exists, do logic to calculate damage
-                EnemyClass target = collider.gameObject.GetComponent<EnemyClass>();
-                if (target != null)
+                float attack = player.Attack - (target.GetDefence() + target.GetArmor());
+                if (player.Weapon != null)
                 {
-                    float attack = player.Attack - (target.GetDefence() + target.GetArmor());
-                    Debug.Log($"attack {attack}");
-                    if (!target.DecreaseHealth(attack))
-                    {
-                        GameObject.Destroy(collider.gameObject);
-                        List<int> spawnTable = target.GetCurrencySpawnTable();
-                        int spawnedCurrency = 0;
-                        int randomInt = Random.Range(0, 100);
-                        if (randomInt < 50)
-                        {
-                            spawnedCurrency = spawnTable[0];
-                        } else if (randomInt < 75)
-                        {
-                            spawnedCurrency = spawnTable[1];
-                        }else if (randomInt < 90)
-                        {
-                            spawnedCurrency = spawnTable[2];
-                        }else if (randomInt < 96)
-                        {
-                            spawnedCurrency = spawnTable[3];
-                        }
-                        else
-                        {
-                            spawnedCurrency = spawnTable[4];
-                        }
+                    attack += player.Weapon.Damage;
+                }
 
-                        Debug.Log($"SPAWNED CURRENCY: {spawnedCurrency}");
+                Debug.Log($"attack {attack}");
+                if (!target.DecreaseHealth(attack))
+                {
+                    // GameObject.Destroy(collider.gameObject);
+                    List<int> spawnTable = target.GetCurrencySpawnTable();
+                    int spawnedCurrency = 0;
+                    int randomInt = Random.Range(0, 100);
+                    if (randomInt < 50)
+                    {
+                        spawnedCurrency = spawnTable[0];
+                    }
+                    else if (randomInt < 75)
+                    {
+                        spawnedCurrency = spawnTable[1];
+                    }
+                    else if (randomInt < 90)
+                    {
+                        spawnedCurrency = spawnTable[2];
+                    }
+                    else if (randomInt < 96)
+                    {
+                        spawnedCurrency = spawnTable[3];
+                    }
+                    else
+                    {
+                        spawnedCurrency = spawnTable[4];
                     }
 
-                    return true;
+                    GameObject.Instantiate(target.GetClampToParent(), target.GetCanvas(), false);
+                    Debug.Log($"SPAWNED CURRENCY: {spawnedCurrency}");
+                }
+                else
+                {
+                    Vector2 currentTargetPosition = target.GetGameObject().transform.position;
+                    Vector2 currentPlayerPosition = player.gameObject.transform.position;
+                    float x = currentTargetPosition.x;
+                    float y = currentTargetPosition.y;
+
+                    if (x - currentPlayerPosition.x <= 0.1)
+                    {
+                        x -= player.KnockbackDistance;
+                    }
+                    else if (x - currentPlayerPosition.x >= 0.1)
+                    {
+                        x += player.KnockbackDistance;
+                    }
+
+                    // target.GetGameObject().transform.position = new Vector2(x, y + player.KnockbackDistance);
+                    target.GetGameObject().transform.position = Vector2.MoveTowards(currentTargetPosition,
+                        new Vector2(x, y + player.KnockbackDistance), player.KnockbackSpeed * Time.deltaTime);
                 }
             }
         }
+
 
         return false;
     }

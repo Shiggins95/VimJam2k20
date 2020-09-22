@@ -10,15 +10,21 @@ public class TriggerBossBattle : MonoBehaviour
     public PlayerController Player;
     public GameStateManager GameStateManager;
     public BossController Boss;
+    public LayerMask BossLayerMask;
 
     private bool _triggered;
 
     private void Update()
     {
-        if (_triggered && Player._isGrounded)
+        if (_triggered && Physics2D.OverlapCircle(Player.GroundCheck3.position, Player.CheckRadius, BossLayerMask))
         {
+            if (Boss == null)
+            {
+                return;
+            }
+
             Boss.gameObject.SetActive(true);
-            GateAnimator.SetBool("IsBossBattle", true);
+            GateAnimator.SetBool("IsOpen", true);
             GameStateManager.IsBossBattle = true;
             // BossAnimator.SetBool("Start", true);
         }

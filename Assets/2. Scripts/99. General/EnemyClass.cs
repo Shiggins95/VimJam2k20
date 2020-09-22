@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public interface EnemyClass
 {
@@ -9,4 +10,11 @@ public interface EnemyClass
     bool DecreaseHealth(float attack);
 
     List<int> GetCurrencySpawnTable();
+
+    GameObject GetGameObject();
+
+    ClampToParent GetClampToParent();
+
+    Transform GetCanvas();
+
 }

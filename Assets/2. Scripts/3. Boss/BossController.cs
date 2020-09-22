@@ -30,8 +30,14 @@ public class BossController : MonoBehaviour, EnemyClass
     public Transform ProjectileSpawnPoint;
 
     public Dialog Dialog;
+    public Dialog SuccessDialog;
+    public Dialog FailureDialog;
 
     public List<int> CurrencyDropTable;
+
+    public ClampToParent LootDisplay;
+
+    public Transform Canvas;
 
     private void Start()
     {
@@ -49,7 +55,10 @@ public class BossController : MonoBehaviour, EnemyClass
 
         if (Health <= 0)
         {
-            Destroy(gameObject);
+            // TODO - trigger death animation and cutscene
+            GetComponent<Animator>().SetBool("IsDead", true);
+            // Destroy(gameObject);
+            return;
         }
 
         if (_currentAttackInterval <= 0)
@@ -64,7 +73,6 @@ public class BossController : MonoBehaviour, EnemyClass
         }
 
         Vector2 currentPosition = transform.position;
-        // float distance = Vector2.Distance(currentPosition, Player.position);
         if (Math.Abs(Player.position.x - transform.position.x) < 0.1)
         {
             if (!GameStateManager.IsBossBattle && Math.Abs(transform.position.x - startingPosition.x) > 0.01)
@@ -116,5 +124,20 @@ public class BossController : MonoBehaviour, EnemyClass
     public List<int> GetCurrencySpawnTable()
     {
         return CurrencyDropTable;
+    }
+
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
+
+    public ClampToParent GetClampToParent()
+    {
+        return LootDisplay;
+    }
+
+    public Transform GetCanvas()
+    {
+        return Canvas;
     }
 }

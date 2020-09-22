@@ -11,8 +11,11 @@ public class PlayerController : MonoBehaviour
     public float Speed;
     public bool _isGrounded;
     public Transform GroundCheck;
+    public Transform GroundCheck2;
+    public Transform GroundCheck3;
     public float CheckRadius;
     public LayerMask GroundLayer;
+    public LayerMask HazardLayer;
     public float JumpForce;
     public float JumpTime;
     private float _jumpTimeCounter;
@@ -22,6 +25,8 @@ public class PlayerController : MonoBehaviour
     public GameObject BloodSplash;
     public Transform HeadTransform;
     public Transform GlobalTransform;
+
+    public TrailRenderer TrailRenderer;
 
     private float _hitTimerStart = 0.5f;
     private float _hitTimer;
@@ -44,6 +49,7 @@ public class PlayerController : MonoBehaviour
         _isJumping = true;
         _hitTimer = _hitTimerStart;
         _heightReached = transform.position.y;
+        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
@@ -53,16 +59,29 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+
         if (Input.GetKeyDown(KeyCode.Q))
         {
             _animator.SetBool("Attacking", true);
             StartCoroutine(SetAttacking());
         }
 
+        if (_isGrounded && !_isJumping && TrailRenderer.enabled)
+        {
+            TrailRenderer.enabled = false;
+        }
+
         // INITIATE JUMPING
-        _isGrounded = Physics2D.OverlapCircle(GroundCheck.position, CheckRadius, GroundLayer);
+        _isGrounded = (Physics2D.OverlapCircle(GroundCheck.position, CheckRadius, GroundLayer) ||
+                       Physics2D.OverlapCircle(GroundCheck2.position, CheckRadius, GroundLayer) ||
+                       Physics2D.OverlapCircle(GroundCheck3.position, CheckRadius, GroundLayer)) ||
+                      (Physics2D.OverlapCircle(GroundCheck.position, CheckRadius, HazardLayer) ||
+                       Physics2D.OverlapCircle(GroundCheck2.position, CheckRadius, HazardLayer) ||
+                       Physics2D.OverlapCircle(GroundCheck3.position, CheckRadius, HazardLayer));
+
         if (_isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
+            TrailRenderer.enabled = true;
             _isJumping = true;
             _rb.velocity = Vector2.up * (JumpForce * Time.fixedDeltaTime);
         }
@@ -93,12 +112,14 @@ public class PlayerController : MonoBehaviour
             _jumpTimeCounter = JumpTime;
         }
 
+        float mouseX = Camera.main.ScreenToWorldPoint(Input.mousePosition).x;
+
         // REVERSE SPRITE IF NECESSARY
-        if (_moveInput > 0)
+        if (mouseX > transform.position.x)
         {
             transform.eulerAngles = new Vector3(0, 0, 0);
         }
-        else if (_moveInput < 0)
+        else if (mouseX < transform.position.x)
         {
             transform.eulerAngles = new Vector3(0, 180, 0);
         }
@@ -178,8 +199,10 @@ public class PlayerController : MonoBehaviour
     {
         if (_gameStateManager.DisableMovement)
         {
+            _rb.velocity = Vector2.zero;
             return;
         }
+
         _moveInput = Input.GetAxisRaw("Horizontal") * Time.fixedDeltaTime;
         _rb.velocity = new Vector2(_moveInput * Speed, _rb.velocity.y);
     }
@@ -188,5 +211,7 @@ public class PlayerController : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(GroundCheck.position, CheckRadius);
+        Gizmos.DrawWireSphere(GroundCheck2.position, CheckRadius);
+        Gizmos.DrawWireSphere(GroundCheck3.position, CheckRadius / 2);
     }
 }

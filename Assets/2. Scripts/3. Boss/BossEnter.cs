@@ -10,30 +10,5 @@ public class BossEnter : StateMachineBehaviour
     {
         Debug.Log($"StateEnter");
         FindObjectOfType<GameStateManager>().DisableMovement = true;
-        Dialog dialog = FindObjectOfType<BossController>().Dialog;
-        FindObjectOfType<DialogManager>().StartDialog(dialog);
-        _dialogManager = DialogManager.Instance;
-        _dialogManager.StartBattle += StartBattle;
     }
-
-    // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            FindObjectOfType<DialogManager>().DisplayNextSentence();
-        }
-    }
-
-    private void StartBattle()
-    {
-        FindObjectOfType<GameStateManager>().DisableMovement = false;
-    }
-
-    //
-    // // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
-    // override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    // {
-    //     
-    // }
 }

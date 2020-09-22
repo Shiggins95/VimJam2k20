@@ -26,23 +26,15 @@ public class GateClosed : StateMachineBehaviour
     {
         if (_currentWaitTime <= 0 && !_dialogStarted)
         {
-            Dialog dialog = FindObjectOfType<BossController>().Dialog;
-            FindObjectOfType<DialogManager>().StartDialog(dialog);
+            _dialogStarted = true;
+             Dialog dialog = FindObjectOfType<BossController>().Dialog;
+            FindObjectOfType<DialogManager>().StartDialog(dialog, "START");
             _dialogManager = DialogManager.Instance;
             _dialogManager.StartBattle += StartBattle;
-            _dialogStarted = true;
         }
         else
         {
             _currentWaitTime -= Time.deltaTime;
-        }
-
-        if (_dialogStarted)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                FindObjectOfType<DialogManager>().DisplayNextSentence();
-            }
         }
     }
 
