@@ -25,6 +25,12 @@ public class UpgradeSlot : MonoBehaviour
 
     private PlayerAttack _playerAttack;
 
+    public bool Highlighted;
+
+    public TextMeshProUGUI NotEnoughCashText;
+
+    public Image HighlightedImage;
+
 
     public bool IsButtonFunc;
 
@@ -50,10 +56,36 @@ public class UpgradeSlot : MonoBehaviour
         {
             CostText.text = _upgradeCost;
         }
+
+        if (Highlighted)
+        {
+            if (!HighlightedImage.gameObject.activeSelf)
+            {
+                HighlightedImage.gameObject.SetActive(true);
+            }
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                UpgradeClick();
+            }
+        }
+        else
+        {
+            if (HighlightedImage.gameObject.activeSelf)
+            {
+                HighlightedImage.gameObject.SetActive(false);
+            }
+        }
     }
 
     public void UpgradeClick()
     {
+        if (_playerWallet.Coins < Int32.Parse(_upgradeCost))
+        {
+            Debug.Log($"not enough cashishi");
+            NotEnoughCashText.gameObject.SetActive(true);
+            return;
+        }
+
         _playerWallet.SpendCoins(Int32.Parse(_upgradeCost));
         _upgradeable.SetLevel(_upgradeable.GetLevel() + 1);
         _upgradeable.SetAttack(Int32.Parse(UpgradeCost.GetStats()[_upgradeable.GetLevel()].ToString()));
