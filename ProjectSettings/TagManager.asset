@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Enemy
+  - Frame1
+  - Frame2
+  - Frame3
+  - FadeToBlack
+  - PlayerTarget
+  - CheckpointSpawn
+  - Red
+  - Green
+  - UpgradeMenu
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - CameraConfiner
+  - Ground
+  - Camera
+  - EnemyContainer
+  - Enemy
+  - Gate
+  - HitBox
+  - BossPlatform
+  - Player
+  - Hazards
+  - Checkpoint
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: BG_0
+    uniqueID: 3998273239
+    locked: 0
+  - name: BG_1
+    uniqueID: 2035392039
+    locked: 0
+  - name: BG_2
+    uniqueID: 2949918467
+    locked: 0
+  - name: BG_3
+    uniqueID: 514989809
+    locked: 0
+  - name: Checkpoint
+    uniqueID: 527918617
+    locked: 0
+  - name: Enemy
+    uniqueID: 2461411595
+    locked: 0
+  - name: Player
+    uniqueID: 4133110355
+    locked: 0
+  - name: Platform
+    uniqueID: 2655162569
+    locked: 0
+  - name: FG_0
+    uniqueID: 1404089361
+    locked: 0

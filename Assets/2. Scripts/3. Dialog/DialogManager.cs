@@ -40,7 +40,7 @@ public class DialogManager : MonoBehaviour
         {
             DisplayNextSentence();
         }
-        
+
         if (Input.GetKey(KeyCode.Space))
         {
             if (_textSpeed <= 0.01)
@@ -60,10 +60,16 @@ public class DialogManager : MonoBehaviour
 
     public void StartDialog(Dialog dialog, string type)
     {
+        AudioSource source = FindObjectOfType<GameStateManager>().gameObject.GetComponent<AudioSource>();
+
+        if (source)
+        {
+            source.mute = true;
+        }
+
         _isStarted = true;
         Type = type;
         Animator.SetBool("IsOpen", true);
-        Debug.Log($"Starting convo with {dialog.Name}");
         NameText.text = dialog.Name;
         Sentences.Clear();
         foreach (string sentence in dialog.Sentences)
@@ -76,12 +82,11 @@ public class DialogManager : MonoBehaviour
 
     public void DisplayNextSentence()
     {
-
         if (_stillTyping)
         {
             return;
         }
-        
+
         if (Sentences.Count == 0)
         {
             EndDialog();
@@ -98,9 +103,8 @@ public class DialogManager : MonoBehaviour
         DialogText.text = "";
         foreach (char letter in sentence)
         {
-            Debug.Log($"TEXT SPEED {_textSpeed}");
             DialogText.text += letter;
-            yield return new WaitForSeconds(_textSpeed);
+            yield return null;
         }
 
         _stillTyping = false;
@@ -108,7 +112,6 @@ public class DialogManager : MonoBehaviour
 
     private void EndDialog()
     {
-        Debug.Log($"dialog ended");
         Animator.SetBool("IsOpen", false);
         _isStarted = false;
         // if event exists, invoke
@@ -120,10 +123,37 @@ public class DialogManager : MonoBehaviour
         {
             EndBattle?.Invoke();
         }
+        else if (Type == "STARTCUTSCENE")
+        {
+            EndStartingCutscene?.Invoke();
+        }
+        else if (Type == "PLAYERSTARTCUTSCENE")
+        {
+            PlayerEndStartingCutscene?.Invoke();
+        }
+        else if (Type == "HEALTHPICKUP")
+        {
+            HealthPickup?.Invoke();
+        }
+        else if (Type == "ENDING")
+        {
+            FinalScene?.Invoke();
+        }
+
+        AudioSource source = FindObjectOfType<GameStateManager>().gameObject.GetComponent<AudioSource>();
+
+        if (source)
+        {
+            source.mute = false;
+        }
     }
 
     public delegate void BossCallback();
 
     public BossCallback StartBattle;
     public BossCallback EndBattle;
+    public BossCallback EndStartingCutscene;
+    public BossCallback PlayerEndStartingCutscene;
+    public BossCallback HealthPickup;
+    public BossCallback FinalScene;
 }

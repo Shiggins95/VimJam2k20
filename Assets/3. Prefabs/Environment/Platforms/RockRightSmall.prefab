@@ -9,7 +9,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 107912139005861653, guid: 1cb39af39abc9466eb45eef96c43c3c3, type: 3}
       propertyPath: m_Name
-      value: RockLeft
+      value: RockRightSmall
       objectReference: {fileID: 0}
     - target: {fileID: 285422865050883286, guid: 1cb39af39abc9466eb45eef96c43c3c3, type: 3}
       propertyPath: m_LocalPosition.x

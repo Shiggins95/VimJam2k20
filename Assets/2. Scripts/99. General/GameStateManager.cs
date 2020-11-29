@@ -13,14 +13,22 @@ public class GameStateManager : MonoBehaviour
     public int CurrentCheckpoint;
     public Vector2 LastCheckpoint;
 
+    public int CurrentCoins;
+    public AudioSource Wahhhh;
+
     private static GameStateManager Instance;
+
     private void Start()
     {
         CurrentCheckpoint = 0;
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(Instance);
+
+            if (SceneManager.GetActiveScene().name != "EntryCutscene")
+            {
+                // DontDestroyOnLoad(Instance);
+            }
         }
         else
         {
@@ -30,10 +38,10 @@ public class GameStateManager : MonoBehaviour
 
     private void Update()
     {
+
         int newCheckpoint = PlayerPrefs.GetInt("CurrentCheckPoint");
         if (CurrentCheckpoint != newCheckpoint)
         {
-            Debug.Log($"NEW CHECKPOINT {newCheckpoint}");
             CurrentCheckpoint = newCheckpoint;
         }
     }

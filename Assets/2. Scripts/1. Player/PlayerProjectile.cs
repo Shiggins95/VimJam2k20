@@ -20,12 +20,15 @@ public class PlayerProjectile : MonoBehaviour
 
     public float Damage;
 
+    public AudioSource InstantiateSource;
+
     private void Start()
     {
         _mainCamera = FindObjectOfType<CameraShake>();
         _player = FindObjectOfType<PlayerAttack>();
         _gameStateManager = FindObjectOfType<GameStateManager>();
         if (!(Camera.main is null)) _target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        InstantiateSource.Play();
     }
 
     private void Update()
@@ -37,7 +40,6 @@ public class PlayerProjectile : MonoBehaviour
 
         if (Math.Abs(transform.position.x - _target.x) <= 0.05 && Math.Abs(transform.position.y - _target.y) <= 0.05)
         {
-            Debug.Log($"destroying");
             GameObject particles = Instantiate(Particles, null, false);
             particles.transform.position = transform.position;
             _mainCamera.Shake(CameraShakeMagnitude, CameraShakeDuration);
@@ -62,7 +64,6 @@ public class PlayerProjectile : MonoBehaviour
             EnemyClass enemy = other.gameObject.GetComponent<EnemyClass>();
             float attack = Damage + _player.Weapon.Damage -
                            (enemy.GetArmor() + enemy.GetDefence());
-            Debug.Log($"ATTACK: {attack}");
             if (attack <= 0)
             {
                 attack = 10;
@@ -93,6 +94,9 @@ public class PlayerProjectile : MonoBehaviour
                 {
                     spawnedCurrency = spawnTable[4];
                 }
+
+                Debug.Log($"SPAWNED CURRENCY: {spawnedCurrency}");
+
 
                 ClampToParent go = Instantiate(enemy.GetClampToParent(), enemy.GetCanvas(), false);
                 go.StartPoint = enemy.GetGameObject().transform.position;

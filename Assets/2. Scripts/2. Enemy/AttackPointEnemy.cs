@@ -35,6 +35,7 @@ public class AttackPointEnemy : MonoBehaviour
             playerProps.Health -= Damage;
             _mainCamera.Shake(CameraShakeMagnitude, CameraShakeDuration);
             _currentDamageInterval = DamageInterval;
+            player.gameObject.GetComponent<PlayerController>().GetHit();
         }
 
         if (_currentDamageInterval > 0)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using TreeEditor;
 using UnityEngine;
 
 public class BossController : MonoBehaviour, EnemyClass
@@ -39,6 +38,9 @@ public class BossController : MonoBehaviour, EnemyClass
 
     public Transform Canvas;
 
+    public Transform LeftAttack;
+    public Transform RightAttack;
+
     private void Start()
     {
         startingPosition = transform.position;
@@ -63,7 +65,13 @@ public class BossController : MonoBehaviour, EnemyClass
 
         if (_currentAttackInterval <= 0)
         {
-            Instantiate(Projectile.gameObject, ProjectileSpawnPoint, false);
+            Projectile go1 = Instantiate(Projectile, ProjectileSpawnPoint, false);
+            Projectile go2 = Instantiate(Projectile, ProjectileSpawnPoint, false);
+            go1.transform.position = LeftAttack.position;
+            go2.transform.position = RightAttack.position;
+
+            go1.Damage = Attack;
+            go2.Damage = Attack;
             // AttackAction.BossAttack();
             _currentAttackInterval = AttackInterval;
         }

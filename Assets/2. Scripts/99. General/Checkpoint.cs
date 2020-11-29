@@ -14,18 +14,18 @@ public class Checkpoint : MonoBehaviour
     private void Start()
     {
         _gm = FindObjectOfType<GameStateManager>();
-        RedLight.gameObject.SetActive(true);
-        GreenLight.gameObject.SetActive(false);
+        // RedLight.gameObject.SetActive(true);
+        // GreenLight.gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            RedLight.gameObject.SetActive(false);
-            GreenLight.gameObject.SetActive(true);
-            GetComponent<BoxCollider2D>().enabled = false;
-            _gm.LastCheckpoint = other.gameObject.transform.position;
+            // RedLight.gameObject.SetActive(false);
+            // GreenLight.gameObject.SetActive(true);
+            // GetComponent<BoxCollider2D>().enabled = false;
+            // _gm.LastCheckpoint = other.gameObject.transform.position;
             // foreach (CheckpointID checkpoint in FindObjectsOfType<CheckpointID>())
             // {
             //     if (checkpoint.ID < CheckpointId)

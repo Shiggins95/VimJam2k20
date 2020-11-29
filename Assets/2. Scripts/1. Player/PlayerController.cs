@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -25,6 +26,8 @@ public class PlayerController : MonoBehaviour
     public GameObject BloodSplash;
     public Transform HeadTransform;
     public Transform GlobalTransform;
+    public AudioSource Footsteps;
+    public LayerMask BossGround;
 
     public TrailRenderer TrailRenderer;
 
@@ -39,6 +42,10 @@ public class PlayerController : MonoBehaviour
 
     private float _heightReached;
 
+    private bool _isRunning;
+
+    public AudioSource HitSound;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -49,7 +56,7 @@ public class PlayerController : MonoBehaviour
         _isJumping = true;
         _hitTimer = _hitTimerStart;
         _heightReached = transform.position.y;
-        DontDestroyOnLoad(gameObject);
+        // DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
@@ -57,6 +64,7 @@ public class PlayerController : MonoBehaviour
     {
         if (_gameStateManager.DisableMovement)
         {
+            Footsteps.Stop();
             return;
         }
 
@@ -77,18 +85,23 @@ public class PlayerController : MonoBehaviour
                        Physics2D.OverlapCircle(GroundCheck3.position, CheckRadius, GroundLayer)) ||
                       (Physics2D.OverlapCircle(GroundCheck.position, CheckRadius, HazardLayer) ||
                        Physics2D.OverlapCircle(GroundCheck2.position, CheckRadius, HazardLayer) ||
-                       Physics2D.OverlapCircle(GroundCheck3.position, CheckRadius, HazardLayer));
+                       Physics2D.OverlapCircle(GroundCheck3.position, CheckRadius, HazardLayer)) ||
+                      (Physics2D.OverlapCircle(GroundCheck.position, CheckRadius, BossGround) ||
+                       Physics2D.OverlapCircle(GroundCheck2.position, CheckRadius, BossGround) ||
+                       Physics2D.OverlapCircle(GroundCheck3.position, CheckRadius, BossGround));
 
         if (_isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
             TrailRenderer.enabled = true;
             _isJumping = true;
             _rb.velocity = Vector2.up * (JumpForce * Time.fixedDeltaTime);
+            _isRunning = false;
         }
 
         // CONTINUOUS JUMPING
         if (Input.GetKey(KeyCode.Space) && _jumpTimeCounter > 0 && _isJumping)
         {
+            _isRunning = false;
             _animator.SetBool("Jumping", true);
             _rb.velocity = Vector2.up * (JumpForce * Time.fixedDeltaTime);
             _jumpTimeCounter -= Time.deltaTime;
@@ -148,10 +161,14 @@ public class PlayerController : MonoBehaviour
         if (_isGrounded && (_isSlamming || _heightReached - transform.position.y > 3))
         {
             // Ripple.MaxAmount = (10 + Mathf.Abs(transform.position.y - _heightReached)) * (_isSlamming ? 1.5f : 0.25f);
-            // Debug.Log($"RIPPLE AMOUNT: {Ripple.MaxAmount}");
             // Ripple.RippleEffect();
             _isSlamming = false;
             _heightReached = transform.position.y;
+        }
+
+        if (!_isRunning)
+        {
+            Footsteps.Stop();
         }
 
         _animator.SetFloat("Speed", Mathf.Abs(_moveInput));
@@ -175,7 +192,6 @@ public class PlayerController : MonoBehaviour
 
     public void PlayParticles(string particleName, Transform _transform)
     {
-        Debug.Log($"particle name: {particleName}");
         GameObject particles;
         // switch (particleName)
         // {
@@ -183,7 +199,6 @@ public class PlayerController : MonoBehaviour
         //         bool isDead = UIManager.RemoveLife();
         //         if (isDead)
         //         {
-        //             Debug.Log($"DEAD");
         //         }
         //
         //         Ripple.MaxAmount = 20;
@@ -204,6 +219,18 @@ public class PlayerController : MonoBehaviour
         }
 
         _moveInput = Input.GetAxisRaw("Horizontal") * Time.fixedDeltaTime;
+        if (!_isRunning && _moveInput != 0 && _isGrounded)
+        {
+            Footsteps.Play();
+            _isRunning = true;
+        }
+
+        if (_moveInput == 0)
+        {
+            Footsteps.Stop();
+            _isRunning = false;
+        }
+
         _rb.velocity = new Vector2(_moveInput * Speed, _rb.velocity.y);
     }
 
@@ -213,5 +240,13 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawWireSphere(GroundCheck.position, CheckRadius);
         Gizmos.DrawWireSphere(GroundCheck2.position, CheckRadius);
         Gizmos.DrawWireSphere(GroundCheck3.position, CheckRadius / 2);
+    }
+
+    public void GetHit()
+    {
+        if (!HitSound.isPlaying)
+        {
+            HitSound.Play();
+        }
     }
 }

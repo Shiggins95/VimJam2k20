@@ -32,6 +32,7 @@ public class BossDeath : StateMachineBehaviour
 
     public void StartLoadingNewScene()
     {
+        FindObjectOfType<PlayerAttack>().EnableNewLife();
         _movePlayer = true;
         GameObject.FindGameObjectWithTag("FadeToBlack").GetComponent<Animator>().Play("FadeToBlack");
     }

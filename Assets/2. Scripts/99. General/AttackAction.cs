@@ -26,8 +26,7 @@ public static class AttackAction
                 {
                     attack += player.Weapon.Damage;
                 }
-
-                Debug.Log($"attack {attack}");
+                
                 if (!target.DecreaseHealth(attack))
                 {
                     // GameObject.Destroy(collider.gameObject);
@@ -87,13 +86,8 @@ public static class AttackAction
 
     public static bool EnemyAttack(PlayerAttack target, EnemyClass attacker)
     {
-        float attack = attacker.GetAttack() - (target.Defence + target.Armour);
+        float attack = attacker.GetAttack() - ((target.Defence + target.Armour) / 3);
         target.Health -= attack;
-        if (target.Health <= 0)
-        {
-            target.gameObject.SetActive(false);
-        }
-
         return target.Health <= 0;
     }
 }

@@ -11,15 +11,24 @@ public class UpgradeMenu : MonoBehaviour
     public Image Selector;
     public List<UpgradeSlot> UpgradeSlots;
     public int CurrentHighlighted;
+    public bool GameOverScreen;
+    public bool TitleScreen;
+
+    public GameObject UpgradeablesMenu;
 
     private void Start()
     {
         CurrentHighlighted = 0;
+        if (GameOverScreen)
+        {
+            UpgradeablesMenu = GameObject.FindGameObjectWithTag("UpgradeMenu");
+            UpgradeablesMenu.SetActive(false);
+        }
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Z))
+        if (Input.GetKeyDown(KeyCode.Z) && !GameOverScreen && !TitleScreen)
         {
             bool newState = true;
 
@@ -41,17 +50,39 @@ public class UpgradeMenu : MonoBehaviour
             MenuAnimator.SetBool("IsOpen", newState);
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        if (!GameOverScreen && !TitleScreen && !MenuAnimator.GetBool("IsOpen"))
         {
-            UpgradeSlots[CurrentHighlighted].Highlighted = false;
-            DecreaseIndex();
+            return;
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
+
+        if (!TitleScreen)
         {
-            UpgradeSlots[CurrentHighlighted].Highlighted = false;
-            IncreaseIndex();
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                UpgradeSlots[CurrentHighlighted].Highlighted = false;
+                DecreaseIndex();
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                UpgradeSlots[CurrentHighlighted].Highlighted = false;
+                IncreaseIndex();
+            }
         }
-        
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+            {
+                UpgradeSlots[CurrentHighlighted].Highlighted = false;
+                DecreaseIndex();
+            }
+
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                UpgradeSlots[CurrentHighlighted].Highlighted = false;
+                IncreaseIndex();
+            }
+        }
+
         UpgradeSlots[CurrentHighlighted].Highlighted = true;
     }
 

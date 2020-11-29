@@ -13,6 +13,7 @@ public class NextLevelTrigger : MonoBehaviour
     public GameObject NextFrame;
     public GameObject PrevFrame;
     public Animator FadeToBlack;
+    public GameObject Enemies;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -24,6 +25,7 @@ public class NextLevelTrigger : MonoBehaviour
 
         if (other.CompareTag("Player"))
         {
+            other.gameObject.GetComponent<PlayerAttack>().Enemies = Enemies;
             NextCam.gameObject.SetActive(true);
             PrevCam.gameObject.SetActive(false);
             Camera.m_BoundingShape2D = NextCam.gameObject.GetComponent<PolygonCollider2D>();
