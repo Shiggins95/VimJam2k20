@@ -4,6 +4,6 @@
 
 ## Downloadable on Windows and MacOS from:
 
-[here](https://shiggy95.itch.io/soul-searching0
+[here](https://shiggy95.itch.io/soul-searching)
 
 ### All artwork, music, sound, code and effects created by me within the 1 week deadline
